@@ -14,6 +14,8 @@ model User {
   role     String
   gigs     Gig[]
   orders   Order[]
+  messages Message[]
+  payouts  Payout[]
 }
 
 model Gig {
@@ -37,6 +39,8 @@ model Order {
   buyer    User  @relation("buyer", fields: [buyerId], references: [id])
   seller   User  @relation("seller", fields: [sellerId], references: [id])
   review   Review?
+  messages Message[]
+  dispute  Dispute?
 }
 
 model Review {
@@ -45,4 +49,38 @@ model Review {
   rating  Int
   comment String
   order   Order @relation(fields: [orderId], references: [id])
+}
+
+model Category {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  senderId  Int
+  text      String
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id])
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+model Payout {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Int
+  status    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Dispute {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @unique
+  reason    String
+  status    String
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id])
 }
